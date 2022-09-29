@@ -78,8 +78,8 @@ class ContentCardLinky extends LitElement {
 
     const attributes = stateObj.attributes;
     const modeCompteur = attributes["typeCompteur"];
-    attributes.diffMonthCurrentVSLast = attributes.current_month - attributes.last_month
-    attributes.diffWeekCurrentVSLast = attributes.current_week - attributes.last_week
+    attributes.diffMonthCurrentVSLast = (attributes.current_month/Math.max(attributes.last_month, 1) -1) * 100
+    attributes.diffWeekCurrentVSLast = (attributes.current_week/Math.max(attributes.last_week/1000, 1) -1) * 100
 
     if (stateObj) {
         if (( modeCompteur === "consommation" ) || ( !modeCompteur )){
@@ -154,7 +154,7 @@ class ContentCardLinky extends LitElement {
                         </span>
                         <div class="tooltip">
                         ${Math.round(attributes.diffWeekCurrentVSLast)}<span class="unit"> %</span><span class="previous-month">par rapport à ${this.weekPreviousYear()}</span>
-                        <span class="tooltiptext">Semaine -1 : ${attributes.last_week}<br>Semaine courante : ${attributes.current_week}</span>
+                        <span class="tooltiptext">Semaine Precedente : ${attributes.last_week/1000}<br>Semaine courante : ${attributes.current_week}</span>
                     </div>
                       </span>`
                     : html ``
