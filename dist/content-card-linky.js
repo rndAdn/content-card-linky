@@ -78,7 +78,9 @@ class ContentCardLinky extends LitElement {
 
     const attributes = stateObj.attributes;
     const modeCompteur = attributes["typeCompteur"];
-    
+    attributes.diffMonthCurrentVSLast = attributes.current_month - attributes.last_month
+    attributes.diffWeekCurrentVSLast = attributes.current_week - attributes.last_week
+
     if (stateObj) {
         if (( modeCompteur === "consommation" ) || ( !modeCompteur )){
           return html`
@@ -119,12 +121,12 @@ class ContentCardLinky extends LitElement {
                     ? html `
                     <span class="variations-linky">
                       <span class="ha-icon">
-                        <ha-icon icon="mdi:arrow-right" style="display: inline-block; transform: rotate(${(attributes.monthly_evolution < 0) ? '45' : ((attributes.monthly_evolution == 0) ? "0" : "-45")}deg)">
+                        <ha-icon icon="mdi:arrow-right" style="display: inline-block; transform: rotate(${(attributes.diffMonthCurrentVSLast < 0) ? '45' : ((attributes.diffMonthCurrentVSLast == 0) ? "0" : "-45")}deg)">
                        </ha-icon>
                       </span>
                       <div class="tooltip">
-                      ${Math.round(attributes.monthly_evolution)}<span class="unit"> %</span><span class="previous-month">par rapport à ${this.previousMonth()}</span>
-                          <span class="tooltiptext">Mois Precedent A-1 : ${attributes.last_month_last_year}<br>Mois Precedent : ${attributes.last_month}</span>
+                      ${Math.round(attributes.diffMonthCurrentVSLast)}<span class="unit"> %</span><span class="previous-month">par rapport à ${this.previousMonth()}</span>
+                          <span class="tooltiptext">Mois Precedent : ${attributes.last_month}<br>Mois Courant : ${attributes.current_month}</span>
                       </div>
                     </span>`
                     : html ``
@@ -147,12 +149,12 @@ class ContentCardLinky extends LitElement {
                     ? html `
                     <span class="variations-linky">
                         <span class="ha-icon">
-                          <ha-icon icon="mdi:arrow-right" style="display: inline-block; transform: rotate(${(attributes.current_week_evolution < 0) ? '45' : ((attributes.current_week_evolution == 0) ? "0" : "-45")}deg)">
+                          <ha-icon icon="mdi:arrow-right" style="display: inline-block; transform: rotate(${(attributes.diffWeekCurrentVSLast < 0) ? '45' : ((attributes.diffWeekCurrentVSLast == 0) ? "0" : "-45")}deg)">
                           </ha-icon>
                         </span>
                         <div class="tooltip">
-                        ${Math.round(attributes.current_week_evolution)}<span class="unit"> %</span><span class="previous-month">par rapport à ${this.weekPreviousYear()}</span>
-                        <span class="tooltiptext">Semaine A-1 : ${attributes.current_week_last_year}<br>Semaine courante : ${attributes.current_week}</span>
+                        ${Math.round(attributes.diffWeekCurrentVSLast)}<span class="unit"> %</span><span class="previous-month">par rapport à ${this.weekPreviousYear()}</span>
+                        <span class="tooltiptext">Semaine -1 : ${attributes.last_week}<br>Semaine courante : ${attributes.current_week}</span>
                     </div>
                       </span>`
                     : html ``
@@ -232,7 +234,7 @@ class ContentCardLinky extends LitElement {
           <div class="main-title">
           <span>${this.config.titleName}</span>
           </div>
-          </div>` 
+          </div>`
        }
   }
   renderError(errorMsg, config) {
@@ -266,7 +268,7 @@ class ContentCardLinky extends LitElement {
   renderHistory(daily, unit_of_measurement, dailyweek, dailyweek_cost, dailyweek_costHC, dailyweek_costHP, dailyweek_HC, dailyweek_HP, config) {
     if (this.config.showHistory === true) {
       if ( dailyweek != undefined){
-        var nbJours = dailyweek.toString().split(",").length ; 
+        var nbJours = dailyweek.toString().split(",").length ;
         if ( config.nbJoursAffichage <= nbJours ) { nbJours = config.nbJoursAffichage }
         return html
           `
@@ -385,6 +387,11 @@ class ContentCardLinky extends LitElement {
        `;
     }
   }
+
+  diffMonthCurrentVSLast(){
+
+  }
+
   renderDayPrice(value, dayNumber, config) {
     if (config.kWhPrice) {
       return html
@@ -447,7 +454,7 @@ class ContentCardLinky extends LitElement {
     if (config.kWhPrice && isNaN(config.kWhPrice)) {
       throw new Error('kWhPrice should be a number')
     }
-    
+
     const defaultConfig = {
       showHistory: true,
       showPeakOffPeak: true,
@@ -484,30 +491,29 @@ class ContentCardLinky extends LitElement {
   getCardSize() {
     return 3;
   }
- 
+
   toFloat(value, decimals = 1) {
     return Number.parseFloat(value).toFixed(decimals);
   }
-  
+
   previousMonth() {
     var d = new Date();
     d.setMonth(d.getMonth()-1) ;
-    d.setFullYear(d.getFullYear()-1 );
-    
+
     return d.toLocaleDateString('fr-FR', {month: "long", year: "numeric"});
-  } 
+  }
   currentMonth() {
     var d = new Date();
     d.setFullYear(d.getFullYear()-1 );
-    
+
     return d.toLocaleDateString('fr-FR', {month: "long", year: "numeric"});
-  } 
+  }
   weekPreviousYear() {
     return "semaine";
-  } 
+  }
   yesterdayPreviousYear() {
     return "hier";
-  } 
+  }
 
 
   static get styles() {
